@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Cloning the code from source control
+                git url: 'https://github.com/krishgandhi1806/devops-prac2.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Example for building the project (e.g., for a Maven project)
+                script {
+                    echo 'Building the application...'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Running tests (e.g., unit tests, integration tests)
+                script {
+                    echo 'Running tests...'
+                }
+            }
+            post {
+                always {
+                   // junit '**/build/test-results/**/*.xml' 
+                }
+            }
+        }
+
+        stage('Static Analysis') {
+            steps {
+                // Example for static code analysis (e.g., SonarQube)
+                script {
+                    echo 'Performing static code analysis...'
+                   // sh 'sonar-scanner' // Replace with your static analysis command
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'main' // Deploy only on the main branch
+            }
+            steps {
+                // Deployment steps, e.g., deploying to a server or container registry
+                script {
+                    echo 'Deploying application...'
+                   // sh './gradlew deploy' // Replace with your deploy command
+                }
+            }
+        }
+
+        stage('Post-Deploy Verification') {
+            when {
+                branch 'main'
+            }
+            steps {
+                // Post-deployment checks (e.g., smoke tests)
+                script {
+                    echo 'Running post-deployment verification...'
+                  //  sh './gradlew verify' // Replace with verification command
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+        always {
+            cleanWs() // Clean up the workspace after build
+        }
+    }
+}
